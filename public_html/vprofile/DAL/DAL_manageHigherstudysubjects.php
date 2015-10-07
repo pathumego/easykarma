@@ -1,0 +1,256 @@
+<?php
+require_once(str_replace('//','/',dirname(__FILE__).'/') ."../config.php");
+require_once(str_replace('//','/',dirname(__FILE__).'/') ."../include/common.php");
+class DAL_manageHigherstudysubjects
+{
+	//---------------------------------------------------------------------------------------------------------
+	
+    public static function addHigherstudysubjects($obj_Higherstudysubjects)
+    {
+
+        $db = config::dbconfig();
+        $obj_retresult = new returnResult();
+        $obj_Higherstudysubjects->SubjectId = DAL_manageHigherstudysubjects::getLastHigherstudysubjectsId()+1;
+		
+		 $sql = "INSERT INTO tbl_higherstudysubjects (SubjectId,SubjectName,SubjectNumber,SubjectField,Level) 
+		VALUES (".
+		common::noSqlInject($obj_Higherstudysubjects->SubjectId).","."'".common::noSqlInject($obj_Higherstudysubjects->SubjectName)."'".",".common::noSqlInject($obj_Higherstudysubjects->SubjectNumber).","."'".common::noSqlInject($obj_Higherstudysubjects->SubjectField)."'".","."'".common::noSqlInject($obj_Higherstudysubjects->Level)."'".
+		");";
+
+        $rs = mysql_query($sql);
+        if (mysql_affected_rows() > 0)
+        {
+            $obj_retresult->type = 1;
+            $obj_retresult->msg = "success";
+			$obj_retresult->data = $obj_Higherstudysubjects;
+        }
+        else
+        {
+            $obj_retresult->type = 0;
+            $obj_retresult->msg = "failed";
+        }
+
+        return $obj_retresult;
+    }
+
+    //---------------------------------------------------------------------------------------------------------
+
+    public static function getLastHigherstudysubjectsId()
+    {
+
+        $lastID = 0;
+        $db = config::dbconfig();
+         $sql = "SELECT MAX(SubjectId) as maxId FROM  tbl_higherstudysubjects";
+        $rs = mysql_query($sql);
+        if ((mysql_num_rows($rs)) > 0)
+        {
+            while ($row = mysql_fetch_array($rs))
+            {
+                $maxId = $row["maxId"];
+                $lastID = is_null($maxId)?0:$maxId;
+            }
+        }
+
+        return $lastID;
+
+    }
+	
+	    //---------------------------------------------------------------------------------------------------------
+
+    public static function getHigherstudysubjectsList()
+    {
+    	  $db = config::dbconfig();
+
+        $arr_HigherstudysubjectsList = array ();
+		$obj_retresult = new returnResult();
+        $sql = "SELECT * FROM tbl_higherstudysubjects ORDER BY SubjectId DESC"; //status should be include to sql for get non deleted item
+        $rs = mysql_query($sql) or die(mysql_error());
+        while ($row = mysql_fetch_array($rs))
+        {		
+        $obj_Higherstudysubjects = new Higherstudysubjects();
+		$obj_Higherstudysubjects->SubjectId= $row["SubjectId"];
+		$obj_Higherstudysubjects->SubjectName= $row["SubjectName"];
+		$obj_Higherstudysubjects->SubjectNumber= $row["SubjectNumber"];
+		$obj_Higherstudysubjects->SubjectField= $row["SubjectField"];
+		$obj_Higherstudysubjects->Level= $row["Level"];
+
+        array_push($arr_HigherstudysubjectsList, $obj_Higherstudysubjects);
+        }
+		
+		if(count($arr_HigherstudysubjectsList) >0 )
+		{
+			$obj_retresult->type = 1;
+			$obj_retresult->data = $arr_HigherstudysubjectsList;
+		}
+		else
+		{
+			$obj_retresult->type =0;
+			
+		}
+
+        return $obj_retresult;
+    }
+	
+	//---------------------------------------------------------------------------------------------------------
+
+    public static function getHigherstudysubjectsBySubjectId($SubjectId)
+    {
+    		
+        $db = config::dbconfig();        
+		$obj_retresult = new returnResult();
+		$obj_Higherstudysubjects = new Higherstudysubjects();
+		$obj_Higherstudysubjects->SubjectId = -1;
+		$sql = "SELECT * FROM tbl_higherstudysubjects WHERE SubjectId=".$SubjectId;
+        $rs = mysql_query($sql) or die(mysql_error());
+        while ($row = mysql_fetch_array($rs))
+        {		        
+		$obj_Higherstudysubjects->SubjectId= $row["SubjectId"];
+		$obj_Higherstudysubjects->SubjectName= $row["SubjectName"];
+		$obj_Higherstudysubjects->SubjectNumber= $row["SubjectNumber"];
+		$obj_Higherstudysubjects->SubjectField= $row["SubjectField"];
+		$obj_Higherstudysubjects->Level= $row["Level"];
+
+        }
+		
+		if($obj_Higherstudysubjects->SubjectId >0 )
+		{
+			$obj_retresult->type = 1;
+			$obj_retresult->data = $obj_Higherstudysubjects;
+		}
+		else
+		{
+			$obj_retresult->type =0;			
+		}
+
+        return $obj_retresult;
+
+    }
+	
+	//---------------------------------------------------------------------------------------------------------
+
+    public static function getHigherstudysubjectsListBySubjectId($SubjectId)
+    {
+    		
+        $db = config::dbconfig();
+
+        $arr_HigherstudysubjectsList = array ();
+		$obj_retresult = new returnResult();
+        $sql = "SELECT * FROM tbl_higherstudysubjects WHERE SubjectId=".$SubjectId." ORDER BY SubjectId DESC";
+        $rs = mysql_query($sql) or die(mysql_error());
+        while ($row = mysql_fetch_array($rs))
+        {		
+        $obj_Higherstudysubjects = new Higherstudysubjects();
+		$obj_Higherstudysubjects->SubjectId= $row["SubjectId"];
+		$obj_Higherstudysubjects->SubjectName= $row["SubjectName"];
+		$obj_Higherstudysubjects->SubjectNumber= $row["SubjectNumber"];
+		$obj_Higherstudysubjects->SubjectField= $row["SubjectField"];
+		$obj_Higherstudysubjects->Level= $row["Level"];
+
+        array_push($arr_HigherstudysubjectsList, $obj_Higherstudysubjects);
+        }
+		
+		if(count($arr_HigherstudysubjectsList) >0 )
+		{
+			$obj_retresult->type = 1;
+			$obj_retresult->data = $arr_HigherstudysubjectsList;
+		}
+		else
+		{
+			$obj_retresult->type =0;
+			
+		}
+
+        return $obj_retresult;
+
+    }
+
+	//---------------------------------------------------------------------------------------------------------
+
+
+	public static function deleteHigherstudysubjects($SubjectId)
+    {
+    		
+        $db = config::dbconfig();
+		$arr_cardList = array();
+		$obj_retresult = new returnResult();
+        $sql = "DELETE FROM tbl_higherstudysubjects WHERE SubjectId=".$SubjectId;
+        $rs = mysql_query($sql) or die(mysql_error());
+		
+		if($rs)
+		{
+			$obj_retresult->type =1;
+		}
+		
+		return $obj_retresult;
+	}
+	
+
+
+	//---------------------------------------------------------------------------------------------------------
+	
+	public static function update($obj_Higherstudysubjects)
+	{
+		$db = config::dbconfig();
+		$obj_retresult = new returnResult();
+		
+		try{
+	
+	$sql = "UPDATE tbl_Higherstudysubjects SET ". 
+	"SubjectId=".common::noSqlInject($obj_Higherstudysubjects->SubjectId).","."SubjectName="."'".common::noSqlInject($obj_Higherstudysubjects->SubjectName)."'".","."SubjectNumber=".common::noSqlInject($obj_Higherstudysubjects->SubjectNumber).","."SubjectField="."'".common::noSqlInject($obj_Higherstudysubjects->SubjectField)."'".","."Level="."'".common::noSqlInject($obj_Higherstudysubjects->Level)."'".	        
+	" WHERE  SubjectId=".$obj_Higherstudysubjects->SubjectId;		 
+		 
+        $rs = mysql_query($sql);
+		//if(mysql_affected_rows()> 0)
+		//{
+			$obj_retresult->type = 1;
+			$obj_retresult->data = $obj_Higherstudysubjects;
+			$obj_retresult->msg = "success";
+			
+		//}
+		//else
+		//{
+		//	$obj_retresult->type = 0;
+		//	$obj_retresult->msg = "failed";
+		//}
+		}
+		catch(Exception $ex)
+		{
+			$obj_retresult->type = 0;
+			$obj_retresult->msg = "failed";
+		}
+
+		return $obj_retresult;
+	}
+	
+	//---------------------------------------------------------------------------------------------------------
+	
+	public static function disableHigherstudysubjects($SubjectId)
+	{
+		 $db = config::dbconfig();
+		$obj_retresult = new returnResult();
+		
+		$sql = "UPDATE tbl_Higherstudysubjects SET Status=0 WHERE  SubjectId=".$SubjectId;		 
+	        
+		 
+        $rs = mysql_query($sql);
+		if(mysql_affected_rows()> 0)
+		{
+			$obj_retresult->type = 1;
+			$obj_retresult->data = $obj_Higherstudysubjects;
+			$obj_retresult->msg = "success";
+			
+		}
+		else
+		{
+			$obj_retresult->type = 0;
+			$obj_retresult->msg = "failed";
+		}
+
+		return $obj_retresult;
+	}
+	
+
+	//---------------------------------------------------------------------------------------------------------
+
+}
+?>
